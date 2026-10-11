@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>My orders · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+        <div class="navbar-links">
+            <a href="landpage.html">HOME</a>
+            <a href="menu.html">MENU</a>
+            <a href="coffeecart.html">COFFEE CART</a>
+            <a href="aboutus.html">ABOUT US</a>
+        </div>
+    </div>
+
+    <main class="receipt-page">
+        <h1 class="page-heading">My orders</h1>
+        <p class="receipt-message" id="orders-message">Loading your orders…</p>
+        <ul class="orders-list" id="orders-list"></ul>
+    </main>
+
+    <script>
+    (function () {
+        const STATUS = {
+            incoming: "Received", preparing: "Being prepared", ready: "Ready for pickup",
+            completed: "Completed", cancelled: "Cancelled",
+        };
+        const money = (n) => "$" + Number(n || 0).toFixed(2);
+        const when = (iso) =>
+            new Date(iso).toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" })
+                .replace(/[\u00a0\u202f\u2009]/g, " ");
+
+        function el(tag, className, text) {
+            const n = document.createElement(tag);
+            if (className) n.className = className;
+            if (text !== undefined) n.textContent = text;
+            return n;
+        }
+
+        async function load() {
+            const message = document.getElementById("orders-message");
+            const list = document.getElementById("orders-list");
+            try {
+                const res = await fetch("/api/my-orders", { credentials: "include" });
+                if (res.status === 401) { location.href = "login.html?next=orders.html"; return; }
+                const data = await res.json();
+                const orders = data.orders || [];
+                list.textContent = "";
+                message.hidden = orders.length > 0;
+                if (!orders.length) { message.textContent = "You have not placed an order yet."; return; }
+                for (const order of orders) {
+                    const li = el("li", "order-row");
+                    const info = el("div", "order-info");
+                    info.append(
+                        el("strong", "", order.number),
+                        el("span", "order-date", when(order.createdAt)),
+                        el("span", "order-items", order.items.map((i) => i.quantity + " × " + i.name).join(", "))
+                    );
+                    const side = el("div", "order-side");
+                    side.append(
+                        el("span", "status-pill status-" + order.status, STATUS[order.status] || order.status),
+                        el("strong", "", money(order.total))
+                    );
+                    const link = el("a", "r-btn", "View receipt");
+                    link.href = "receipt.html?order=" + encodeURIComponent(order.id);
+                    side.append(link);
+                    li.append(info, side);
+                    list.append(li);
+                }
+            } catch (err) {
+                message.hidden = false;
+                message.textContent = "Could not reach the shop. Check your connection and try again.";
+            }
+        }
+        load();
+        setInterval(load, 10000); // status updates while the page is open
+    })();
+    </script>
+</body>
+</html>

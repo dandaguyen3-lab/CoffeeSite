@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CMS Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="cmscolor" onload="readcontent()" onload="toggleMenu()">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+  <h1>Edit Homepage Text</h1>
+  <p>Remove text to revert to default.</p>
+
+  <form id="cms-form">
+    <label>Hero Title:</label><br>
+    <textarea id="title-name" rows="2" cols="50"></textarea><br><br>
+
+    <label>Popular Section Title:</label><br>
+    <textarea id="popular-title" rows="1" cols="50"></textarea><br><br>
+
+    <label>Coffee 1 Title:</label><br>
+    <input id="coffee1-title" type="text"><br><br>
+
+    <label>Coffee 1 Description:</label><br>
+    <textarea id="coffee1-desc" rows="4" cols="50"></textarea><br><br>
+
+
+    <img id="coffee1-image" src="Assets/Coffee templates/Americano with bg1.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee1-image', 'Assets/Coffee templates/Americano with bg1.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee1-image-file"><br><br>
+
+    <label>Coffee 2 Title:</label><br>
+    <input id="coffee2-title" type="text"><br><br>
+
+    <label>Coffee 2 Description:</label><br>
+    <textarea id="coffee2-desc" rows="4" cols="50"></textarea><br><br>
+
+    <img id="coffee2-image" src="Assets/Coffee templates/Cafe au lait.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee2-image', 'Assets/Coffee templates/Cafe au lait.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee2-image-file"><br><br>
+
+
+    <label>Coffee 3 Title:</label><br>
+    <input id="coffee3-title" type="text"><br><br>
+
+    <label>Coffee 3 Description:</label><br>
+    <textarea id="coffee3-desc" rows="4" cols="50"></textarea><br><br>
+        
+    <img id="coffee3-image" src="Assets/Coffee templates/Cappucino.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee3-image', 'Assets/Coffee templates/Cappucino.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee3-image-file"><br><br>
+
+    <label>Coffee 4 Title:</label><br>
+    <input id="coffee4-title" type="text"><br><br>
+
+    <label>Coffee 4 Description:</label><br>
+    <textarea id="coffee4-desc" rows="4" cols="50"></textarea><br><br>
+    <img id="coffee4-image" src="Assets/Coffee templates/Espresso.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee4-image', 'Assets/Coffee templates/Espresso.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee4-image-file"><br><br>
+
+    <label>Coffee 5 Title:</label><br>
+    <input id="coffee5-title" type="text"><br><br>
+
+    <label>Coffee 5 Description:</label><br>
+    <textarea id="coffee5-desc" rows="4" cols="50"></textarea><br><br>
+    
+    <img id="coffee5-image" src="Assets/Coffee templates/Flatwhite.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee5-image', 'Assets/Coffee templates/Flatwhite.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee5-image-file"><br><br>
+
+    <label>Coffee 6 Title:</label><br>
+    <input id="coffee6-title" type="text"><br><br>
+
+    <label>Coffee 6 Description:</label><br>
+    <textarea id="coffee6-desc" rows="4" cols="50"></textarea><br><br>
+    
+    <img id="coffee6-image" src="Assets/Coffee templates/Latte.webp" data-default="Assets/BG/1.jpg" style="max-width: 200px;"><br>
+    <button type="button" onclick="revertImage('coffee6-image', 'Assets/Coffee templates/Latte.webp')">Revert to Default</button>
+    <label>Image:</label><br><br>
+    <input type="file" id="coffee6-image-file"><br><br>
+
+    <label>Copyright:</label><br>
+    <textarea id="copyright-text" rows="2" cols="50"></textarea><br><br>
+
+    <button type="submit">Save</button><br><br>
+
+    </form>
+
+    <div class="menu-toggle-buttons">
+      <button class="toggle-btn" data-coffee="coffee1-menu">Toggle Americano</button>
+      <button class="toggle-btn" data-coffee="coffee2-menu">Toggle Café au Lait</button>
+      <button class="toggle-btn" data-coffee="coffee3-menu">Toggle Cappuccino</button>
+
+      <button class="toggle-btn" data-coffee="coffee4-menu">Toggle Espresso</button>
+      <button class="toggle-btn" data-coffee="coffee5-menu">Toggle Flat White</button>
+      <button class="toggle-btn" data-coffee="coffee6-menu">Toggle Latte</button>
+  </div>
+  
+    <div class="menu-list" id="menu-list"></div>
+  
+  <script>
+    savecontent();
+    toggleMenu();
+  </script>
+</body>
+</html>

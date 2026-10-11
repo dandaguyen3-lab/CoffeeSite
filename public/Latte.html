@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Latte - Kopi Ko</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+        <div class="navbar-links">
+          <a href="landpage.html">HOME</a>
+          <a href="menu.html">MENU</a>
+          <a href="coffeecart.html">COFFEE CART</a>
+          <a href="aboutus.html">ABOUT US</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="options">
+        <div class="options1">
+            <div class="coffee-order">
+                <img src="Assets/Coffee templates/Latte no bg.png" alt="Latte">
+                <span>Latte
+                    – Rich espresso balanced with steamed milk and a light layer of foam. A coffee-forward classic.
+                    <br>
+                    <br> Calories: 120–150 kcal
+                </span>
+            </div>
+        </div>
+        
+        <br>
+        <div class="sizes">
+            <div class="button-container">
+                <button class="coffee-button" onclick="window.location.href='customize.html?coffee=Latte&image=Assets/Coffee templates/Latte no bg.png'"><b>Customize</b></button>
+            </div>
+            <h2>Size options:<br><br></h2>
+            
+            <br>
+            <div class="size-selector" id="sizeSelector">
+                <div class="underline" id="underline">
+                </div>
+                
+                <div class="size-option" data-size="Short">
+                    <div class="circle"></div>
+                    <img src="Assets/C.png" alt="Short">
+                    <p>Short<br><small>8 fl oz</small></p>
+                </div>
+                <div class="size-option" data-size="Tall">
+                    <div class="circle"></div>
+                    <img src="Assets/Medium_new-removebg-preview.png" alt="Tall">
+                    <p>Tall<br><small>12 fl oz</small></p>
+                </div>
+                <div class="size-option" data-size="Grande">
+                    <div class="circle"></div>
+                    <img src="Assets/Large_new-removebg-preview.png" alt="Grande">
+                    <p>Grande<br><small>16 fl oz</small></p>
+                </div>
+                <div class="size-option selected" data-size="Venti">
+                    <div class="circle"></div>
+                    <img src="Assets/NEW_XL-removebg-preview.png" alt="Venti">
+                    <p>Venti<br><small>20 fl oz</small></p>
+                </div>
+            </div>
+            <div class="buttons">
+                <br>
+                <br>
+                <br>
+                <br>
+                <div class="addtoorder">
+                    <button class="addtoorderbtn" onclick="addToCart('Latte', document.querySelector('.size-option.selected').dataset.size, 'Assets/Coffee templates/Latte no bg.png')"><b>ADD TO ORDER</b></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        sizes();
+        // Add click event listeners to size options
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                option.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>

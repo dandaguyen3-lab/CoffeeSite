@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff desk · Kopi Ko</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage admin-body">
+  <div id="admin-login" class="admin-gate">
+    <form class="loginform" onsubmit="return false;">
+      <p class="admin-kicker">Staff only</p>
+      <h1 class="login">Kitchen desk</h1>
+      <label class="namelabel" for="staff-user">Staff username</label>
+      <input class="name" id="staff-user" autocomplete="username">
+      <label class="pwlabel" for="staff-pass">Staff password</label>
+      <input class="pw" id="staff-pass" type="password" autocomplete="current-password">
+      <button class="button" type="button" id="staff-login-btn">Enter desk</button>
+      <p class="wrong" id="staff-error"></p>
+    </form>
+  </div>
+
+  <div id="admin-app" class="admin-app" hidden>
+    <header class="admin-top">
+      <a class="brand" href="landpage.html"><span>Kopi Ko</span><small>Staff desk</small></a>
+      <nav class="admin-tabs">
+        <button class="admin-tab is-active" data-tab="orders">Live orders</button>
+        <button class="admin-tab" data-tab="users">Registered customers <span id="user-count">0</span></button>
+      </nav>
+      <div class="admin-top-actions">
+        <span class="live-pill" id="live-pill">Live</span>
+        <button class="coffee-button" type="button" id="staff-logout">Log out</button>
+      </div>
+    </header>
+
+    <section id="tab-orders" class="admin-panel">
+      <div class="admin-stats" id="order-stats"></div>
+      <div class="order-board" id="order-board"></div>
+    </section>
+
+    <section id="tab-users" class="admin-panel" hidden>
+      <p class="admin-note">
+        Customer passwords are hashed on the server and cannot be viewed.
+        You can see each account’s username, email, join date, and how many orders they have placed.
+      </p>
+      <div class="users-table-wrap">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Mobile</th>
+              <th>Joined</th>
+              <th>Last login</th>
+              <th>Orders</th>
+            </tr>
+          </thead>
+          <tbody id="users-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const columns = [
+      { id: "incoming", title: "New orders", next: "preparing", nextLabel: "Start preparing" },
+      { id: "preparing", title: "Preparing", next: "ready", nextLabel: "Mark ready" },
+      { id: "ready", title: "Ready for pickup", next: "completed", nextLabel: "Complete" },
+      { id: "completed", title: "Completed", next: null, nextLabel: "" },
+    ];
+
+    let lastIncomingIds = new Set();
+    let known = false;
+
+    // Everything customers type (usernames, emails, drink names) is escaped before it is shown here.
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      }[c]));
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return "—";
+      return new Date(iso).toLocaleString();
+    }
+
+    function customizationLabel(customizations) {
+      if (!customizations || !Object.keys(customizations).length) {
+        return "<em>No extras</em>";
+      }
+      return Object.entries(customizations)
+        .map(([name, qty]) => `<span>${esc(Number(qty))}× ${esc(name)}</span>`)
+        .join("");
+    }
+
+    function nextAction(status) {
+      if (status === "incoming") return { status: "preparing", label: "Start preparing" };
+      if (status === "preparing") return { status: "ready", label: "Mark ready" };
+      if (status === "ready") return { status: "completed", label: "Complete order" };
+      return null;
+    }
+
+    async function staffLogin() {
+      const errorEl = document.getElementById("staff-error");
+      errorEl.textContent = "";
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          username: document.getElementById("staff-user").value,
+          password: document.getElementById("staff-pass").value,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        errorEl.textContent = data.error || "Could not log in.";
+        return;
+      }
+      showDesk();
+    }
+
+    async function showDesk() {
+      const check = await fetch("/api/admin/me", { credentials: "include" });
+      if (!check.ok) return;
+      document.getElementById("admin-login").hidden = true;
+      document.getElementById("admin-app").hidden = false;
+      loadUsers();
+      loadOrders();
+      startLive();
+    }
+
+    function startLive() {
+      if (window.EventSource) {
+        const source = new EventSource("/api/admin/orders/stream");
+        source.onmessage = (event) => {
+          const payload = JSON.parse(event.data);
+          if (payload.orders) renderOrders(payload.orders);
+          if (payload.users) renderUsers(payload.users);
+        };
+        source.onerror = () => {
+          document.getElementById("live-pill").textContent = "Reconnecting";
+        };
+        source.onopen = () => {
+          document.getElementById("live-pill").textContent = "Live";
+        };
+      }
+      // Safety net in case a proxy buffers the live stream.
+      setInterval(() => { loadOrders(); loadUsers(); }, 5000);
+    }
+
+    async function loadOrders() {
+      const res = await fetch("/api/admin/orders", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      renderOrders(data.orders || []);
+    }
+
+    function renderOrders(orders) {
+      const incomingIds = new Set(orders.filter((o) => o.status === "incoming").map((o) => o.id));
+      if (known) {
+        for (const id of incomingIds) {
+          if (!lastIncomingIds.has(id)) pingNewOrder();
+        }
+      }
+      known = true;
+      lastIncomingIds = incomingIds;
+
+      const stats = document.getElementById("order-stats");
+      const counts = {
+        incoming: orders.filter((o) => o.status === "incoming").length,
+        preparing: orders.filter((o) => o.status === "preparing").length,
+        ready: orders.filter((o) => o.status === "ready").length,
+        completed: orders.filter((o) => o.status === "completed").length,
+      };
+      stats.innerHTML = `
+        <div><strong>${counts.incoming}</strong><span>Incoming</span></div>
+        <div><strong>${counts.preparing}</strong><span>Preparing</span></div>
+        <div><strong>${counts.ready}</strong><span>Ready</span></div>
+        <div><strong>${counts.completed}</strong><span>Done</span></div>
+      `;
+
+      const board = document.getElementById("order-board");
+      board.innerHTML = columns.map((col) => {
+        const list = orders.filter((o) =>
+          col.id === "completed"
+            ? o.status === "completed" || o.status === "cancelled"
+            : o.status === col.id
+        );
+        return `
+          <div class="order-column">
+            <h2>${col.title} <small>${list.length}</small></h2>
+            <div class="order-list">
+              ${list.length ? list.map(orderCard).join("") : `<p class="empty-col">None right now</p>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      board.querySelectorAll("[data-advance]").forEach((btn) => {
+        btn.onclick = () => updateStatus(btn.dataset.id, btn.dataset.advance);
+      });
+      board.querySelectorAll("[data-cancel]").forEach((btn) => {
+        btn.onclick = () => updateStatus(btn.dataset.id, "cancelled");
+      });
+    }
+
+    function orderCard(order) {
+      const action = nextAction(order.status);
+      const items = (order.items || []).map((item) => `
+        <li>
+          <div class="ticket-item-top">
+            <strong>${esc(Number(item.quantity))}× ${esc(item.name)}</strong>
+            <span>${esc(item.size)}</span>
+          </div>
+          <div class="ticket-extras">${customizationLabel(item.customizations)}</div>
+        </li>
+      `).join("");
+      return `
+        <article class="order-card">
+          <header>
+            <div>
+              <p class="order-no">${esc(order.number)}${order.status === "cancelled" ? " · cancelled" : ""}</p>
+              <h3>${esc(order.customer.username)}</h3>
+              <p class="order-email">${esc(order.customer.email)}${order.customer.phone ? " · " + esc(order.customer.phone) : ""}</p>
+            </div>
+            <time>${esc(fmtTime(order.createdAt))}</time>
+          </header>
+          <ul class="ticket-items">${items}</ul>
+          <p class="ticket-total">Total $${Number(order.total).toFixed(2)}</p>
+          <div class="ticket-actions">
+            ${action ? `<button class="apply-btn" data-advance="${esc(action.status)}" data-id="${esc(order.id)}">${esc(action.label)}</button>` : ""}
+            ${order.status !== "completed" && order.status !== "cancelled"
+              ? `<button class="cancel-btn" data-cancel data-id="${esc(order.id)}">Cancel</button>`
+              : ""}
+          </div>
+        </article>
+      `;
+    }
+
+    async function updateStatus(id, status) {
+      await fetch("/api/admin/orders/" + id, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      loadOrders();
+    }
+
+    async function loadUsers() {
+      const res = await fetch("/api/admin/users", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      renderUsers(data.users || []);
+    }
+
+    function renderUsers(users) {
+      const body = document.getElementById("users-body");
+      document.getElementById("user-count").textContent = users.length;
+      if (!users.length) {
+        body.innerHTML = `<tr><td colspan="6">No customers have registered yet.</td></tr>`;
+        return;
+      }
+      body.innerHTML = users.map((user) => `
+        <tr>
+          <td>${esc(user.username)}</td>
+          <td>${esc(user.email)}</td>
+          <td>${esc(user.phone || "—")}</td>
+          <td>${esc(fmtTime(user.createdAt))}</td>
+          <td>${esc(fmtTime(user.lastLoginAt))}</td>
+          <td>${esc(user.orderCount)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function pingNewOrder() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = 880;
+        gain.gain.value = 0.04;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.18);
+      } catch (err) {}
+    }
+
+    document.getElementById("staff-login-btn").onclick = staffLogin;
+    document.getElementById("staff-pass").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") staffLogin();
+    });
+    document.getElementById("staff-logout").onclick = async () => {
+      await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+      location.reload();
+    };
+    document.querySelectorAll(".admin-tab").forEach((tab) => {
+      tab.onclick = () => {
+        document.querySelectorAll(".admin-tab").forEach((t) => t.classList.remove("is-active"));
+        tab.classList.add("is-active");
+        document.getElementById("tab-orders").hidden = tab.dataset.tab !== "orders";
+        document.getElementById("tab-users").hidden = tab.dataset.tab !== "users";
+        if (tab.dataset.tab === "users") loadUsers();
+      };
+    });
+
+    showDesk();
+  </script>
+</body>
+</html>

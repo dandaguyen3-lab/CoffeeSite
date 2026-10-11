@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Customize Your Coffee · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+        <div class="navbar-links">
+            <a href="landpage.html">HOME</a>
+            <a href="menu.html">MENU</a>
+            <a href="coffeecart.html">COFFEE CART</a>
+            <a href="aboutus.html">ABOUT US</a>
+        </div>
+    </div>
+
+    <div class="customize-container">
+        <div class="coffee-preview">
+            <img id="coffee-preview-img" src="Assets/Coffee templates/Americano no bg.png" alt="Coffee Preview">
+            <div class="coffee-info">
+                <h2 id="coffee-preview-title">Customize Your Coffee</h2>
+                <p>Make it exactly how you like it.</p>
+                <p class="customize-rules" id="customize-rules"></p>
+            </div>
+        </div>
+
+        <div class="customize-section">
+            <h3>Sweeteners</h3>
+            <div class="options-grid" id="sweeteners">
+                <div class="option-item" data-option="sugar">
+                    <img src="Assets/addons/sugar.svg" alt="">
+                    <p>Sugar</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Sugar">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Sugar">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+                <div class="option-item" data-option="honey">
+                    <img src="Assets/addons/honey.svg" alt="">
+                    <p>Honey</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Honey">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Honey">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+                <div class="option-item" data-option="stevia">
+                    <img src="Assets/addons/stevia.svg" alt="">
+                    <p>Stevia</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Stevia">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Stevia">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+            </div>
+        </div>
+
+        <div class="customize-section">
+            <h3>Add-ins</h3>
+            <div class="options-grid" id="addins">
+                <div class="option-item" data-option="cream">
+                    <img src="Assets/addons/cream.svg" alt="">
+                    <p>Cream</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Cream">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Cream">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+                <div class="option-item" data-option="milk">
+                    <img src="Assets/addons/milk.svg" alt="">
+                    <p>Milk</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Milk">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Milk">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+                <div class="option-item" data-option="vanilla">
+                    <img src="Assets/addons/vanilla.svg" alt="">
+                    <p>Vanilla Syrup</p>
+                    <small class="option-price"></small>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, -1)" aria-label="Less Vanilla Syrup">-</button>
+                        <span class="quantity-num">0</span>
+                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)" aria-label="More Vanilla Syrup">+</button>
+                    </div>
+                    <small class="option-charge"></small>
+                </div>
+            </div>
+        </div>
+
+        <div class="customize-summary" id="customize-summary" aria-live="polite"></div>
+
+        <div class="customize-buttons">
+            <button type="button" class="cancel-btn" onclick="window.history.back()">Cancel</button>
+            <button type="button" class="apply-btn" onclick="applyCustomizations()">Apply Changes</button>
+        </div>
+    </div>
+
+    <script>
+        const P = window.KOPI_PRICING;
+        const money = (n) => "$" + n.toFixed(2);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const coffeeName = urlParams.get('coffee') || 'Coffee';
+        const coffeeImage = urlParams.get('image') || 'Assets/Coffee templates/Americano no bg.png';
+        document.getElementById('coffee-preview-img').src = coffeeImage;
+        document.getElementById('coffee-preview-title').textContent = `Customize Your ${coffeeName}`;
+        document.getElementById('customize-rules').textContent =
+            `The first ${P.freePerExtra} of each extra are free. After that each one costs a little extra, up to ${P.maxPerExtra} of each.`;
+
+        // Price hint under every option, taken from pricing.js
+        document.querySelectorAll('.option-item').forEach((item) => {
+            const extra = P.extras[item.dataset.option];
+            item.querySelector('.option-price').textContent =
+                `${P.freePerExtra} free, then ${money(extra.price)} each`;
+        });
+
+        function currentSelection() {
+            const chosen = {};
+            document.querySelectorAll('.option-item').forEach((item) => {
+                const qty = parseInt(item.querySelector('.quantity-num').textContent, 10);
+                if (qty > 0) chosen[item.dataset.option] = qty;
+            });
+            return chosen;
+        }
+
+        function refresh() {
+            document.querySelectorAll('.option-item').forEach((item) => {
+                const qty = parseInt(item.querySelector('.quantity-num').textContent, 10);
+                const [minus, plus] = item.querySelectorAll('.quantity-btn');
+                minus.disabled = qty <= 0;
+                plus.disabled = qty >= P.maxPerExtra;
+                item.classList.toggle('selected', qty > 0);
+                const extra = P.extras[item.dataset.option];
+                const paid = Math.max(0, qty - P.freePerExtra);
+                const charge = item.querySelector('.option-charge');
+                charge.textContent = qty >= P.maxPerExtra
+                    ? `Maximum reached${paid ? " · +" + money(paid * extra.price) : ""}`
+                    : paid ? `+${money(paid * extra.price)}` : '';
+            });
+            const cost = P.extrasCost(currentSelection());
+            document.getElementById('customize-summary').textContent = cost > 0
+                ? `Extras: +${money(cost)} per drink`
+                : 'Extras: no extra charge';
+        }
+
+        function updateQuantity(btn, change) {
+            const span = btn.parentElement.querySelector('.quantity-num');
+            const next = Math.min(P.maxPerExtra, Math.max(0, parseInt(span.textContent, 10) + change));
+            span.textContent = next;
+            refresh();
+        }
+
+        function applyCustomizations() {
+            // Saved for THIS drink only, so extras never leak onto a different coffee.
+            localStorage.setItem('currentCustomizations', JSON.stringify(currentSelection()));
+            localStorage.setItem('currentCustomizationsFor', coffeeName);
+            if (window.history.length > 1) window.history.back();
+            else window.location.href = 'menu.html';
+        }
+
+        // Show what was already chosen for this drink
+        const saved = storedCustomizationsFor(coffeeName);
+        document.querySelectorAll('.option-item').forEach((item) => {
+            const qty = Math.min(P.maxPerExtra, Number(saved[item.dataset.option]) || 0);
+            item.querySelector('.quantity-num').textContent = qty;
+        });
+        refresh();
+    </script>
+</body>
+</html>

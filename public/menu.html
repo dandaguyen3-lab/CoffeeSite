@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Menu · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage" onload="toggleMenu()">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+  <div class="navbar-links">
+    <a href="landpage.html">HOME</a>
+    <a href="menu.html">MENU</a>
+    <a href="coffeecart.html">COFFEE CART</a>
+    <a href="aboutus.html">ABOUT US</a>
+  </div>
+
+</div>
+<div class="bg">
+  <img src="Assets/BG/1.jpg" class="menubgimage" alt="Coffee beans">
+  <div class="homeoverlay-text">
+    <h1>The menu</h1>
+  </div>
+  </div>
+<div class="menutext1">
+<h2 class="menutext">Popular coffee</h2>
+</div>
+<div class="menu" id="menu-items">
+  <div class="menu-column">
+    <a href="Americano.html" class="menu-item" id="coffee1-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Americano.webp" alt="Americano">
+      <span>Americano</span>
+    </a>
+
+    <a href="Cafe au lait.html" class="menu-item" id="coffee2-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Cafe au lait.webp" alt="Café au lait">
+      <span>Café au lait</span>
+    </a>
+    <a href="Cappucino.html" class="menu-item" id="coffee3-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Cappucino.webp" alt="Cappuccino">
+      <span>Cappuccino</span>
+    </a>
+  </div>
+  <div class="menu-column2">
+    <a href="Espresso.html" class="menu-item" id="coffee4-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Espresso.webp" alt="Espresso">
+      <span>Espresso</span>
+    </a>
+    <a href="Flat White.html" class="menu-item" id="coffee5-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Flatwhite.webp" alt="Flat White">
+      <span>Flat White</span>
+    </a>
+    <a href="Latte.html" class="menu-item" id="coffee6-menu">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Latte.webp" alt="Latte">
+      <span>Latte</span>
+    </a>
+  </div>
+</div>
+<div class="menutext1">
+  <h2 class="menutext">Iced coffee</h2>
+  </div>
+<div class="menu">
+  <div class="menu-column">
+    <a href="Cold Brew.html" class="menu-item">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Coldbrew.webp" alt="Cold Brew">
+      <span>Cold Brew</span>
+    </a>
+
+    <a href="Frappe.html" class="menu-item">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Frappe.webp" alt="Frappe">
+      <span>Frappe</span>
+    </a>
+    <a href="Iced Coffee.html" class="menu-item">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Iced Coffee.webp" alt="Iced coffee">
+      <span>Iced coffee</span>
+    </a>
+  </div>
+  <div class="menu-column2">
+    <a href="Nitro Cold Brew.html" class="menu-item">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Nitrocold brew.webp" alt="Nitro cold brew">
+      <span>Nitro cold brew</span>
+    </a>
+    <a href="Vietnamese Coffee.html" class="menu-item">
+      <img loading="lazy" decoding="async" src="Assets/thumbs/Vietnamese Coffee.webp" alt="Vietnamese coffee">
+      <span>Vietnamese coffee</span>
+    </a>
+  </div>
+</div>
+
+<script>enableSmartNavbarScroll();
+toggleMenu();
+document.addEventListener('DOMContentLoaded', () => {
+  const coffeeIds = [
+    'coffee1-menu',
+    'coffee2-menu',
+    'coffee3-menu',
+    'coffee4-menu',
+    'coffee5-menu',
+    'coffee6-menu'
+  ];
+
+  coffeeIds.forEach(id => {
+    const element = document.getElementById(id);
+    const isHidden = localStorage.getItem(id) === 'hidden';
+
+    if (element) {
+      element.style.display = isHidden ? 'none' : '';
+    }
+  });
+});
+
+
+</script>
+</body>
+</html>

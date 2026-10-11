@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Create Account · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="loginpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+    <div>
+    <h1 class="logi">Create account</h1>
+<form class="loginform" onsubmit="createAccount(); return false;">
+    <label for="username" class="namelabel"><b>Username</b></label>
+    <input type="text" class="name" id="createusername" name="username" placeholder="Letters, numbers, . - _" autocomplete="username" minlength="2" maxlength="30" required>
+    <label for="password" class="pwlabel"><b>Password</b></label>
+    <input type="password" class="pw" id="createpassword" placeholder="At least 6 characters" name="password" autocomplete="new-password" minlength="6" required>
+    <label for="email" class="emaillabel"><b>Email</b></label>
+    <input type="email" class="email" id="createemail" placeholder="you@example.com" name="email" autocomplete="email" required>
+    <label for="createphone" class="phonelabel"><b>Mobile number</b></label>
+    <input type="tel" class="phone" id="createphone" name="phone" placeholder="09XX XXX XXXX" autocomplete="tel" inputmode="numeric" maxlength="16" required>
+    <small class="field-hint">Must start with 09 and have 11 digits, so the shop can reach you about your order.</small>
+    <button class="button" type="submit">Create account</button>
+    <a class="linkcreate" href="login.html">Already have an account?</a>
+</form>
+<p class="wrong" id="result" role="alert"></p>
+    </div>
+</body>
+</html>

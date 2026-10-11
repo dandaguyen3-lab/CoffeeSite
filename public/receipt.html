@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>E-receipt · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+        <div class="navbar-links">
+            <a href="landpage.html">HOME</a>
+            <a href="menu.html">MENU</a>
+            <a href="coffeecart.html">COFFEE CART</a>
+            <a href="aboutus.html">ABOUT US</a>
+        </div>
+    </div>
+
+    <main class="receipt-page">
+        <p class="receipt-banner" id="receipt-banner" hidden>Your order was sent to the kitchen. Here is your e-receipt.</p>
+        <p class="receipt-message" id="receipt-message">Loading your receipt…</p>
+        <article class="receipt" id="receipt" hidden></article>
+        <div class="receipt-actions" id="receipt-actions" hidden>
+            <button type="button" class="r-btn primary" id="btn-pdf">Download receipt (PDF)</button>
+            <button type="button" class="r-btn" id="btn-print">Print</button>
+            <a class="r-btn" href="orders.html">My orders</a>
+            <a class="r-btn" href="menu.html">Back to menu</a>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        const SHOP = "Kopi Ko Kopi Mo";
+        const STATUS = {
+            incoming: "Received",
+            preparing: "Being prepared",
+            ready: "Ready for pickup",
+            completed: "Completed",
+            cancelled: "Cancelled",
+        };
+        const params = new URLSearchParams(location.search);
+        const orderId = params.get("order");
+        let currentOrder = null;
+
+        const money = (n) => "$" + Number(n || 0).toFixed(2);
+        const cap = (t) => String(t).charAt(0).toUpperCase() + String(t).slice(1);
+        const when = (iso) =>
+            new Date(iso)
+                .toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" })
+                .replace(/[\u00a0\u202f\u2009]/g, " ");
+        const extrasOf = (item) =>
+            Object.entries(item.customizations || {}).map(([k, q]) => q + " " + cap(k));
+        const extrasNote = (item) =>
+            item.extrasCharge > 0 ? " (extras +" + money(item.extrasCharge) + " each)" : "";
+
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        }
+
+        function row(label, value) {
+            const r = el("div", "r-row");
+            r.append(el("span", "r-label", label), el("span", "r-value", value));
+            return r;
+        }
+
+        function render(order) {
+            const box = document.getElementById("receipt");
+            box.textContent = "";
+
+            const head = el("header", "r-head");
+            head.append(el("h1", "", SHOP), el("p", "r-kicker", "E-RECEIPT"));
+            head.append(el("p", "r-number", order.number));
+            head.append(el("span", "status-pill status-" + order.status, STATUS[order.status] || order.status));
+
+            const meta = el("div", "r-meta");
+            meta.append(row("Date", when(order.createdAt)));
+            meta.append(row("Customer", order.customer.username));
+            if (order.customer.phone) meta.append(row("Mobile", order.customer.phone));
+            meta.append(row("Email", order.customer.email));
+
+            const items = el("ul", "r-items");
+            for (const item of order.items) {
+                const li = el("li");
+                const top = el("div", "r-item-top");
+                top.append(
+                    el("span", "r-item-name", item.quantity + " × " + item.name),
+                    el("span", "r-item-price", money(item.unitPrice * item.quantity))
+                );
+                const sub = el("div", "r-item-sub", item.size + " · " + money(item.unitPrice) + " each");
+                li.append(top, sub);
+                const extras = extrasOf(item);
+                if (extras.length) li.append(el("div", "r-item-sub", "+ " + extras.join(", ") + extrasNote(item)));
+                items.append(li);
+            }
+
+            const total = el("div", "r-total");
+            total.append(el("span", "", "Total"), el("span", "", money(order.total)));
+
+            const foot = el("footer", "r-foot");
+            foot.append(
+                el("p", "", "Thank you for ordering!"),
+                el("p", "", "Please show this receipt at pickup.")
+            );
+
+            box.append(head, meta, items, total, foot);
+            box.hidden = false;
+            document.getElementById("receipt-actions").hidden = false;
+            document.getElementById("receipt-message").hidden = true;
+        }
+
+        /* ---------- PDF (built in the browser, no libraries) ---------- */
+        const COLS = 36; // characters per line in the receipt PDF
+        const pad = (text, width) => text + " ".repeat(Math.max(0, width - text.length));
+
+        function wrap(text, width) {
+            const out = [];
+            let line = "";
+            for (const word of String(text).split(" ")) {
+                let w = word;
+                while (w.length > width) {
+                    if (line) { out.push(line); line = ""; }
+                    out.push(w.slice(0, width));
+                    w = w.slice(width);
+                }
+                if (!line) line = w;
+                else if ((line + " " + w).length <= width) line += " " + w;
+                else { out.push(line); line = w; }
+            }
+            if (line) out.push(line);
+            return out.length ? out : [""];
+        }
+
+        function receiptLines(order) {
+            const L = [];
+            const rule = { t: "-".repeat(COLS) };
+            const kv = (label, value) => {
+                const w = COLS - 10;
+                wrap(value, w).forEach((part, i) => L.push({ t: pad(i ? "" : label, 10) + part }));
+            };
+            L.push({ t: SHOP.toUpperCase(), bold: true, size: 12, center: true });
+            L.push({ t: "E-RECEIPT", center: true });
+            L.push({ t: "" });
+            L.push({ t: order.number, bold: true, size: 14, center: true });
+            L.push({ t: (STATUS[order.status] || order.status).toUpperCase(), center: true });
+            L.push(rule);
+            kv("Date", when(order.createdAt));
+            kv("Customer", order.customer.username);
+            if (order.customer.phone) kv("Mobile", order.customer.phone);
+            kv("Email", order.customer.email);
+            L.push(rule);
+            for (const item of order.items) {
+                const price = money(item.unitPrice * item.quantity);
+                const left = item.quantity + "x " + item.name + " (" + item.size + ")";
+                const parts = wrap(left, COLS - price.length - 1);
+                L.push({ t: pad(parts[0], COLS - price.length) + price });
+                parts.slice(1).forEach((p) => L.push({ t: "   " + p }));
+                L.push({ t: "   @ " + money(item.unitPrice) + " each" });
+                const extras = extrasOf(item);
+                if (extras.length) wrap("+ " + extras.join(", ") + extrasNote(item), COLS - 3).forEach((p) => L.push({ t: "   " + p }));
+            }
+            L.push(rule);
+            const tot = money(order.total);
+            const totalCols = 29; // larger type fits fewer characters across the page
+            L.push({ t: pad("TOTAL", totalCols - tot.length) + tot, bold: true, size: 11, center: true });
+            L.push(rule);
+            L.push({ t: "" });
+            L.push({ t: "Thank you for ordering!", center: true });
+            L.push({ t: "Please show this receipt at pickup.", center: true });
+            return L;
+        }
+
+        function buildPdf(order) {
+            const lines = receiptLines(order);
+            const margin = 18, base = 9, charW = 0.6;
+            const width = Math.round(margin * 2 + COLS * base * charW);
+            const heights = lines.map((l) => (l.size || base) * 1.5);
+            const height = Math.ceil(margin * 2 + heights.reduce((a, b) => a + b, 0));
+
+            // Latin-1 only: anything else becomes "?"
+            const clean = (t) => t.replace(/[\u00a0\u202f\u2009]/g, " ").replace(/[^\x20-\xff]/g, "?");
+            const esc = (t) => clean(t).replace(/[\\()]/g, (c) => "\\" + c);
+
+            let y = height - margin;
+            let content = "";
+            lines.forEach((l, i) => {
+                const size = l.size || base;
+                y -= heights[i];
+                if (!l.t) return;
+                const w = clean(l.t).length * size * charW;
+                const x = l.center ? Math.max(margin, (width - w) / 2) : margin;
+                content += "BT /" + (l.bold ? "F2" : "F1") + " " + size + " Tf " +
+                    x.toFixed(2) + " " + (y + size * 0.3).toFixed(2) + " Td (" + esc(l.t) + ") Tj ET\n";
+            });
+
+            const objs = [
+                "<< /Type /Catalog /Pages 2 0 R >>",
+                "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+                "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + width + " " + height + "] " +
+                    "/Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+                "<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>",
+                "<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>",
+                "<< /Length " + content.length + " >>\nstream\n" + content + "endstream",
+            ];
+            let pdf = "%PDF-1.4\n";
+            const offsets = [];
+            objs.forEach((body, i) => {
+                offsets.push(pdf.length);
+                pdf += (i + 1) + " 0 obj\n" + body + "\nendobj\n";
+            });
+            const xref = pdf.length;
+            pdf += "xref\n0 " + (objs.length + 1) + "\n0000000000 65535 f \n";
+            offsets.forEach((o) => { pdf += String(o).padStart(10, "0") + " 00000 n \n"; });
+            pdf += "trailer\n<< /Size " + (objs.length + 1) + " /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF";
+
+            const bytes = new Uint8Array(pdf.length);
+            for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xff;
+            return new Blob([bytes], { type: "application/pdf" });
+        }
+
+        function downloadPdf() {
+            if (!currentOrder) return;
+            const url = URL.createObjectURL(buildPdf(currentOrder));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Kopi-Ko-receipt-" + currentOrder.number + ".pdf";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        /* ---------- load ---------- */
+        async function load() {
+            const message = document.getElementById("receipt-message");
+            if (!orderId) { message.textContent = "No order selected. Open a receipt from My orders."; return; }
+            try {
+                const res = await fetch("/api/orders/" + encodeURIComponent(orderId), { credentials: "include" });
+                if (res.status === 401) {
+                    location.href = "login.html?next=" + encodeURIComponent("receipt.html?order=" + orderId);
+                    return;
+                }
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) { message.textContent = data.error || "Could not load this receipt."; return; }
+                currentOrder = data.order;
+                render(currentOrder);
+                if (params.get("new")) document.getElementById("receipt-banner").hidden = false;
+            } catch (err) {
+                message.textContent = "Could not reach the shop. Check your connection and try again.";
+            }
+        }
+
+        document.getElementById("btn-pdf").onclick = downloadPdf;
+        document.getElementById("btn-print").onclick = () => window.print();
+        load();
+    })();
+    </script>
+</body>
+</html>

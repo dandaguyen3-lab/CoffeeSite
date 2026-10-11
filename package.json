@@ -1,0 +1,16 @@
+{
+  "name": "kopi-ko-kopi-mo",
+  "version": "1.0.0",
+  "description": "Kopi Ko coffee shop site with live orders and staff admin",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.0"
+  }
+}

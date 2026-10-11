@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Kopi Ko Kopi Mo</title>
+    <meta name="description" content="Kopi Ko Kopi Mo coffee shop. Browse the menu and order ahead.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage" onload="readcontent()">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+  <div class="navbar-links">
+    <a href="landpage.html">HOME</a>
+    <a href="menu.html">MENU</a>
+    <a href="coffeecart.html">COFFEE CART</a>
+    <a href="aboutus.html">ABOUT US</a>
+  </div>
+</div>
+<div class="bg">
+  <img src="Assets/BG/1.jpg" id="title-image" class="foreground-image" alt="Cafe interior">
+  <div class="homeoverlay-text">
+    <h1 id="title-name">KOPI KO<br>KOPI MO</h1>
+    <div class="hero-actions">
+      <a class="hero-btn primary" href="menu.html">Order now</a>
+      <a class="hero-btn" href="createaccount.html" data-guest>Create account</a>
+      <a class="hero-btn" href="coffeecart.html" data-member hidden>View my cart</a>
+    </div>
+    <p class="hero-note" data-guest>Browse freely. You only need an account when you order.</p>
+    <p class="hero-note" data-member hidden>Signed in as <strong data-username></strong></p>
+  </div>
+</div>
+<div class="popularcoffee1">
+<h1 class="popularcoffee" id="popular-title">Popular coffees</h1>
+</div>
+<div class="home1">
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Americano with bg1.webp" alt="Americano" id="coffee1-image" />
+  </div>
+  <div class="hometext1">
+    <h2 id="coffee1-title">Americano</h2>
+    <p id="coffee1-desc">This glass holds a classic Americano at its finest smooth, rich, and full of depth. The dark, inviting body promises a bold flavor, while the light layer of crema hints at the freshness and care behind every pour. It's a straightforward kind of coffee, but one that never fails to deliver a satisfying, energizing experience. Every sip is clean, balanced, and refreshingly honest a true go-to for coffee lovers 
+      who appreciate pure, unfiltered quality.</p>
+    <a href="Americano.html" class="homebutton1">Order now</a>
+  </div>
+</div>
+<div class="home1">
+  <div class="hometext1">
+    <h2 id="coffee2-title">Café au lait</h2>
+    <p id="coffee2-desc">This Café au Lait brings together the boldness of brewed coffee and the gentle creaminess of warm milk in perfect harmony. It's mellow, smooth, and beautifully balanced — a drink that doesn’t shout, but soothes. With each sip, you get the comforting depth of coffee softened just enough to make it endlessly drinkable. Ideal for slow mornings or thoughtful afternoons, it’s the kind of cup that quietly becomes a daily ritual.</p>
+    <a href="Cafe au lait.html" class="homebutton1">Order now</a>
+  </div>
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Cafe au lait.webp" alt="Café au lait" id="coffee2-image"/>
+  </div>
+</div>
+<div class="home1">
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Cappucino.webp" alt="Cappuccino" id="coffee3-image"/>
+  </div>
+  <div class="hometext1">
+    <h2 id="coffee3-title">Cappuccino</h2>
+    <p id="coffee3-desc">A perfect balance of bold espresso, velvety steamed milk, and a cloud of creamy foam — this cappuccino is warmth in a cup. From the first sip, you're met with a rich, full-bodied flavor softened by the delicate, airy texture on top. It's the kind of drink that feels like a quiet morning hug, crafted to both awaken and comfort. Simple, elegant, and deeply satisfying — a timeless favorite done just right.</p>
+    <a href="Cappucino.html" class="homebutton1">Order now</a>
+  </div>
+</div>
+<div class="home1">
+  <div class="hometext1">
+    <h2 id="coffee4-title">Espresso</h2>
+    <p id="coffee4-desc">Small in size but bold in character, this espresso is a concentrated burst of deep, roasted flavor. Rich, intense, and unapologetically strong, it delivers a full-bodied experience with a velvety crema that hints at its expert extraction. Each sip is a moment of clarity — sharp, invigorating, and unforgettable. It's coffee stripped down to its purest form, made for those who crave depth without distraction.</p>
+    <a href="Espresso.html" class="homebutton1">Order now</a>
+  </div>
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Espresso.webp" alt="Espresso" id="coffee4-image"/>
+  </div>
+</div>
+<div class="home1">
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Flatwhite.webp" alt="Flat White" id="coffee5-image"/>
+  </div>
+  <div class="hometext1">
+    <h2 id="coffee5-title">Flat White</h2>
+    <p id="coffee5-desc">A harmonious blend of rich espresso and perfectly textured microfoam, the flat white is elegance in a cup. With its velvety feel and bold coffee core, it delivers a smooth, creamy experience that never overpowers. The milk is just enough to soften the espresso's edge while letting its character shine through. Balanced, sophisticated, and effortlessly smooth — it's the quiet confidence of the coffee world.</p>
+    <a href="Flat White.html" class="homebutton1">Order now</a>
+  </div>
+</div>
+<div class="home1">
+  <div class="hometext1">
+    <h2 id="coffee6-title">Latte</h2>
+    <p id="coffee6-desc">The latte is where bold espresso meets the gentle touch of steamed milk, creating a creamy, mellow drink that soothes with every sip. Smooth and approachable, it's the perfect balance of strength and softness — rich enough to satisfy, yet light enough to linger. Topped with a delicate layer of foam, it's the kind of cup that invites you to slow down, savor the moment, and just breathe.</p>
+    <a href="Latte.html" class="homebutton1">Order now</a>
+  </div>
+  <div class="homeimage1">
+    <img loading="lazy" decoding="async" src="Assets/Coffee templates/Latte.webp" alt="Latte" id="coffee6-image"/>
+  </div>
+</div>
+<p class="copyright" id="copyright-text">© 2025 "KOPI KO KOPI MO" Company. All rights reserved.</p>
+<script>
+readcontent();
+enableSmartNavbarScroll();
+</script>
+</body>
+</html>

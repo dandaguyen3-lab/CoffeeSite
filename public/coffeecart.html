@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Coffee Cart · Kopi Ko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landpage">
+    <script src="pricing.js"></script>
+    <script src="script.js"></script>
+
+    <div class="navbar">
+        <div class="navbar-links">
+            <a href="landpage.html">HOME</a>
+            <a href="menu.html">MENU</a>
+            <a href="coffeecart.html">COFFEE CART</a>
+            <a href="aboutus.html">ABOUT US</a>
+        </div>
+    </div>
+
+    <h1 class="page-heading">Your order</h1>
+
+    <template id="cart-item-template">
+        <div class="cart-item">
+            <div class="item-info">
+                <div class="coffee-image">
+                    <img src="" alt="">
+                </div>
+                <div class="item-details">
+                    <span class="coffee-name"></span>
+                    <div class="customizations"></div>
+                    <span class="quantity">
+                        <button class="quantity-btn decrease">-</button>
+                        <span class="quantity-num"></span>
+                        <button class="quantity-btn increase">+</button>
+                    </span>
+                </div>
+            </div>
+            <div class="price-section">
+                <span class="item-price"></span>
+                <button class="remove-btn">Remove</button>
+            </div>
+        </div>
+    </template>
+
+    <div class="cart-container" id="cart-container">
+    </div>
+
+    <script>
+        displayCartItems();
+        
+        const updateCheckoutButton = () => {
+            const checkoutBtn = document.querySelector('.cart-container button[onclick="checkout()"]');
+            if (checkoutBtn) {
+                checkoutBtn.className = 'checkout-btn';
+            }
+        };
+        setTimeout(updateCheckoutButton, 100);
+    </script>
+</body>
+</html>
