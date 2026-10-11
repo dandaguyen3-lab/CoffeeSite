@@ -97,7 +97,7 @@ This system lets customers order ahead from any device. Orders appear on the sta
 - **Security.** Text typed by customers is escaped on the admin page, login and sign-up are rate limited, redirects after login stay on this site, staff sessions expire after 12 hours, and the staff password is set outside the code.
 
 ## AI tools used and what they were used for
-S
+
 **Claude (by Anthropic), through the Claude chat app.** It was used for:
 
 - Making the site public to browse with login required only to order (login prompt on Add to order, automatic login after sign-up, safe redirects).
